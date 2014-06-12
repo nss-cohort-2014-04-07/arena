@@ -1,9 +1,15 @@
 'use strict';
 
 var Cookies = require('cookies');
+var traceur = require('traceur');
+var User;
+var users = {};
 
 exports.connection = function(socket){
-  addUserToSocket(socket);
+  if(global.nss){
+    User = traceur.require(__dirname + '/../models/user.js');
+    addUserToSocket(socket);
+  }
 };
 
 /* -------------------------------------------------------------------------- */
@@ -19,19 +25,10 @@ function addUserToSocket(socket){
     decoded = decode(encoded);
   }
 
-  // 1. Find user in DB
-  // 2. Add user to socket
-  // 3. Inform the user they are online
-
-  // EXAMPLE CODE
-
-  // User.findByUserId(obj.userId, user=>{
-  //   socket.set('user', user, ()=>{
-  //     socket.emit('online');
-  //   });
-  // });
-
-  console.log(decoded);
+  User.findById(decoded.userId, user=>{
+    users[decoded.userId] = user;
+    socket.emit('online');
+  });
 }
 
 function decode(string) {

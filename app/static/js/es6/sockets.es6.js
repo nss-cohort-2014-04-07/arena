@@ -13,5 +13,10 @@
 
   function initializeSocketIo(){
     socket = io.connect('/app');
+    socket.on('online', online);
+  }
+
+  function online(){
+    console.log('YOU ARE NOW ON SOCKET IO');
   }
 })();
