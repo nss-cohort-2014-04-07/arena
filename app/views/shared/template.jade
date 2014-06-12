@@ -5,6 +5,21 @@ html
     title= title
     link(href='/less/app.css', rel='stylesheet')
   body
+    h3= user ? user.email : 'Anonymous'
+    if(user)
+      form(method='POST', action='/logout')
+        button Logout
+      nav
+        ul
+          li: a(href='/') Home
+          li: a(href='/play') Play
+    else
+      nav
+        ul
+          li: a(href='/') Home
+          li: a(href='/login') Login
+          li: a(href='/register') Register
+
     block content
 
     script(src='/js/vendor/jquery-2.1.1.js')
