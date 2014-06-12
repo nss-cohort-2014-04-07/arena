@@ -7,8 +7,12 @@ var users = {};
 
 exports.connection = function(socket){
   if(global.nss){
-    User = traceur.require(__dirname + '/../models/user.js');
+    if(!User){
+      User = traceur.require(__dirname + '/../models/user.js');
+    }
+
     addUserToSocket(socket);
+    socket.on('send-message', sendMessage);
   }
 };
 
@@ -16,18 +20,28 @@ exports.connection = function(socket){
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
+function sendMessage(data){
+  if(data.message.contains('script')){return;}
+
+  var socket = this;
+
+  data.email = socket.nss.user.email;
+  socket.broadcast.emit('receive-message', data);
+  socket.emit('receive-message', data);
+}
+
 function addUserToSocket(socket){
   var cookies = new Cookies(socket.handshake, {}, ['SEC123', '321CES']);
   var encoded = cookies.get('express:sess');
-  var decoded;
-
-  if(encoded){
-    decoded = decode(encoded);
-  }
+  var decoded = decode(encoded);
 
   User.findById(decoded.userId, user=>{
+    console.log(user.email + ' : connected to arena');
     users[decoded.userId] = user;
-    socket.emit('online');
+    socket.nss = {};
+    socket.nss.user = user;
+    socket.emit('online', users);
+    socket.broadcast.emit('online', users);
   });
 }
 

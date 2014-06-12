@@ -9,5 +9,10 @@ block content
         p GAME BOARD
       td.chat
         p CHAT
-        ul#users
+        input#message(type='text')
+        button#send Troll
         #chat
+        ul#users
+
+block scripts
+  script(src='/js/es6/compiled/sockets.js')
